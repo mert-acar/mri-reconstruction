@@ -9,11 +9,15 @@ def pad(array, offsets):
     offsets: list of offsets (number of elements must be equal to the dimension of the array)
     """
     # Create an array of zeros with the reference shape
-    result = np.zeros([int(array.shape[0] + (2 * offsets[0])), int(array.shape[1] + (2 * offsets[1]))], dtype=array.dtype)
+    result = np.zeros([array.shape[0], int(array.shape[1] + (2 * offsets[0])), int(array.shape[2] + (2 * offsets[1]))], dtype=array.dtype)
     # Create a list of slices from offset to offset + shape in each dimension
-    insertHere = [slice(int(offsets[dim]), int(offsets[dim] + array.shape[dim])) for dim in range(array.ndim)]
+    insertHere = [
+        slice(None), 
+        slice(int(offsets[0]), int(offsets[0] + array.shape[1])),
+        slice(int(offsets[1]), int(offsets[1] + array.shape[2]))
+    ]
     # Insert the array in the result at the specified offsets
-    result[insertHere] = array
+    result[tuple(insertHere)] = array
     return result
 
 
@@ -91,7 +95,7 @@ def normal_pdf(length, sensitivity):
     return np.exp(-sensitivity * (np.arange(length) - length / 2)**2)
 
 
-def fft2c(x):
+def fft2c(x, norm='ortho'):
     '''
     Centered fft
     Note: fft2 applies fft to last 2 axes by default
@@ -99,11 +103,11 @@ def fft2c(x):
     :return:
     '''
     axes = (-2, -1)  # get last 2 axes
-    res = fftshift(fft2(ifftshift(x, axes=axes), norm='ortho'), axes=axes)
+    res = fftshift(fft2(ifftshift(x, axes=axes), norm=norm), axes=axes)
     return res
 
 
-def ifft2c(x):
+def ifft2c(x, norm='ortho'):
     '''
     Centered ifft
     Note: fft2 applies fft to last 2 axes by default
@@ -111,7 +115,7 @@ def ifft2c(x):
     :return:
     '''
     axes = (-2, -1)  # get last 2 axes
-    res = fftshift(ifft2(ifftshift(x, axes=axes), norm='ortho'), axes=axes)
+    res = fftshift(ifft2(ifftshift(x, axes=axes), norm=norm), axes=axes)
     return res
 
 

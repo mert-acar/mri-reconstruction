@@ -5,6 +5,7 @@ from helpers import *
 from scipy.io import loadmat
 from numpy.lib.stride_tricks import as_strided
 
+
 class OCMRDataset(torch.utils.data.Dataset):
     def __init__(self, data_path, fold='train', fraction=0.85, shuffle=None, acceleration_factor=4.0, sample_n=10, acq_noise=0, centred=False, norm='ortho'):
         self.data_path = data_path
@@ -106,15 +107,18 @@ class OCMRDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         # Load the data
         data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn']
-        data = pad(data, [(256 - data.shape[i]) / 2 for i in range(len(data.shape))])
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
         data_und, k_und = self.undersample(data, mask)
+        data = pad(data, [int((256 - data.shape[dim]) / 2) for dim in range(1,data.ndim)])
+        data_und = pad(data_und, [int((256 - data_und.shape[dim]) / 2) for dim in range(1,data_und.ndim)])
+        k_und = pad(k_und, [int((256 - k_und.shape[dim]) / 2) for dim in range(1,k_und.ndim)])
+        mask = pad(mask, [int((256 - mask.shape[dim]) / 2) for dim in range(1,mask.ndim)])
         data_gnd = format_data(data)
         data_und = format_data(data_und)
         k_und = format_data(k_und)
         mask = format_data(mask, mask=True)
-
+        
         return {
             'image': data_und,
             'k': k_und.transpose(1,2,0),
@@ -125,8 +129,6 @@ class OCMRDataset(torch.utils.data.Dataset):
 if __name__ == '__main__':
     import yaml
     args = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
-
     dataset = OCMRDataset(fold='train', **args['dataset'])
-    print(len(dataset))
-    dataset2 = OCMRDataset(fold='test', **args['dataset'])
-    print(len(dataset2))
+    sample = dataset[0]
+    print('Sample image shape:', sample['image'].shape)
