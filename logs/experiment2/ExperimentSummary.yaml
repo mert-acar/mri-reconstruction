@@ -1,0 +1,34 @@
+# Model Parameters
+network:
+        num_cascades: 5
+        num_layers: 5 # Number of layers in the CNN per cascade
+        num_filters: 64
+        kernel_size: 3
+        stride: 1
+        padding: 1 #A padding of 1 is needed to keep the image in the same size
+        noise: null #Noise in the measurements. To be used in the data consistency step
+
+#Dataset parameters
+dataset:
+        data_path: '../../mri/data/processed/'
+        acceleration_factor: 4.0
+        fraction: 0.85 #train set size
+        shuffle: null #Seed for numpy random generator
+        sample_n: 10
+        acq_noise: 0 #acquisation noise
+        centred: False
+        norm: 'ortho' #norm: 'ortho' or null. if 'ortho', performs unitary transform, otherwise normal dft
+
+# Training parameters
+train:
+        batch_size: 12
+        num_epochs: 200
+        early_stop: 20
+        #Adam Optimizer Parameters
+        learning_rate: 0.0001
+        b_1: 0.9
+        b_2: 0.999
+        l2: 0.0000001
+        #Miscellaneous
+        output_path: '../logs/experiment2'
+        cuda: True
