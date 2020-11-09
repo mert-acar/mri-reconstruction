@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy as np
+from math import ceil
 from helpers import *
 from scipy.io import loadmat
 from numpy.lib.stride_tricks import as_strided
@@ -110,10 +111,10 @@ class OCMRDataset(torch.utils.data.Dataset):
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
         data_und, k_und = self.undersample(data, mask)
-        data = pad(data, [int((256 - data.shape[dim]) / 2) for dim in range(1,data.ndim)])
-        data_und = pad(data_und, [int((256 - data_und.shape[dim]) / 2) for dim in range(1,data_und.ndim)])
-        k_und = pad(k_und, [int((256 - k_und.shape[dim]) / 2) for dim in range(1,k_und.ndim)])
-        mask = pad(mask, [int((256 - mask.shape[dim]) / 2) for dim in range(1,mask.ndim)])
+        data = pad(data, [ceil((256 - data.shape[dim]) / 2) for dim in range(1,data.ndim)])
+        data_und = pad(data_und, [ceil((256 - data_und.shape[dim]) / 2) for dim in range(1,data_und.ndim)])
+        k_und = pad(k_und, [ceil((256 - k_und.shape[dim]) / 2) for dim in range(1,k_und.ndim)])
+        mask = pad(mask, [ceil((256 - mask.shape[dim]) / 2) for dim in range(1,mask.ndim)])
         data_gnd = format_data(data)
         data_und = format_data(data_und)
         k_und = format_data(k_und)
