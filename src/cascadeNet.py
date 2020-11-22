@@ -22,7 +22,7 @@ class ResnetBlock(nn.Module):
         self.layers = nn.Sequential(*self.layers)
 
     def forward(self, x):
-        residual = x['image'].clone()
+        residual = x['image']
         out = self.layers(x['image'])
         out += residual 
         return {

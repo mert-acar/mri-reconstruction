@@ -10,7 +10,7 @@ network:
 
 #Dataset parameters
 dataset:
-        data_path: '../../../mri/data/new/data/'
+        data_path: '../../ocmr/data/processed'
         acceleration_factor: 4.0
         fraction: 0.85 #train set size
         shuffle: null #Seed for numpy random generator
@@ -21,9 +21,9 @@ dataset:
 
 # Training parameters
 train:
-        batch_size: 20
-        num_epochs: 200
-        early_stop: 60
+        batch_size: 16
+        num_epochs: 5500
+        early_stop: 100
 
         # Adam Optimizer Parameters
         learning_rate: 0.0001
@@ -32,5 +32,5 @@ train:
         l2: 0.0000001
 
         # Miscellaneous
-        output_path: '../logs/experiment7'
+        output_path: '../logs/sanity_check'
         cuda: True

@@ -48,8 +48,8 @@ def train_model(model, dataloaders, optimizer, criterion, args):
                     for im_i, und_i, pred_i in zip(back_format(batch['full'].cpu().detach().numpy()), 
                                                    back_format(batch['image'].cpu().detach().numpy()),
                                                    back_format(output['image'].cpu().detach().numpy())):
-                        base_psnr += complex_psnr(im_i, und_i, peak='max')
-                        test_psnr += complex_psnr(im_i, pred_i, peak='max')
+                        base_psnr += complex_psnr(im_i, und_i, peak='normalized')
+                        test_psnr += complex_psnr(im_i, pred_i, peak='normalized')
                 running_error += loss.item() * bsize
             epoch_loss = running_error / len(dataloaders[phase].dataset)
             if phase == 'train':
