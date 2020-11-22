@@ -104,18 +104,17 @@ class OCMRDataset(torch.utils.data.Dataset):
         return mask
 
 
-
     def __getitem__(self, idx):
-        # Load the data
         data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn']
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
         data_und, k_und = self.undersample(data, mask)
         data_gnd = format_data(data)
+        data_gnd = normalize(data_gnd)
         data_und = format_data(data_und)
+        data_und = normalize(data_und)
         k_und = format_data(k_und)
         mask = format_data(mask, mask=True)
-        
         return {
             'image': data_und,
             'k': k_und.transpose(1,2,0),
@@ -123,8 +122,10 @@ class OCMRDataset(torch.utils.data.Dataset):
             'full': data_gnd
         }
 
+
 if __name__ == '__main__':
     import yaml
+    from cascadeNet import CascadeNetwork
     args = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
     dataset = OCMRDataset(fold='train', **args['dataset'])
     sample = dataset[0]

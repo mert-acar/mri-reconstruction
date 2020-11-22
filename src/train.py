@@ -40,7 +40,7 @@ def train_model(model, dataloaders, optimizer, criterion, args):
                 output = model(batch)
                 optimizer.zero_grad()
                 loss = criterion(output['image'], batch['full'])
-                # loss = criterion(output['image'], batch['full'].contiguous(memory_format=torch.channels_last))
+                
                 if phase == 'train':
                     loss.backward()
                     optimizer.step()
@@ -95,13 +95,13 @@ def train():
             OCMRDataset(fold='train', **args['dataset']),
             batch_size=train_args['batch_size'],
             shuffle=True,
-            num_workers=8
+            # num_workers=8
         ),
         'test': torch.utils.data.DataLoader(
             OCMRDataset(fold='test', **args['dataset']),
             batch_size=train_args['batch_size'],
             shuffle=True,
-            num_workers=8
+            # num_workers=8
         )
     }
 
@@ -121,7 +121,8 @@ def train():
     print('Training starting with', len(dataloaders['train'].dataset),
           'training and', len(dataloaders['test'].dataset), 'testing data...')
     model = train_model(model, dataloaders, optimizer, criterion, train_args)
+    return model
     
 
 if __name__ == '__main__':
-    train()
+    model = train()

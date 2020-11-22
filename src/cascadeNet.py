@@ -25,12 +25,8 @@ class ResnetBlock(nn.Module):
         residual = x['image']
         out = self.layers(x['image'])
         out += residual 
-        return {
-            'image': out,
-            'k': x['k'],
-            'mask': x['mask'],
-            'full': x['full']
-        }
+        x['image'] = out
+        return x 
 
 
 class DataConsistency(nn.Module):
@@ -50,13 +46,8 @@ class DataConsistency(nn.Module):
 
         temp = torch.ifft(temp, signal_ndim=2, normalized=True)
         temp = temp.permute(0, 3, 1, 2).float() 
-        
-        return {
-            'image': temp,
-            'k': x['k'],
-            'mask': x['mask'],
-            'full': x['full']
-        }
+        x['image'] = temp
+        return x
 
 
 class CascadeNetwork(nn.Module):
