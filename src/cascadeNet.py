@@ -37,14 +37,16 @@ class DataConsistency(nn.Module):
     def forward(self, x):
         image = x['image'].permute(0, 2, 3, 1) # prepare for torch.fft
 
-        temp = torch.fft(image, signal_ndim=2, normalized=True)
+        # temp = torch.fft(image, signal_ndim=2, normalized=True)
+        temp = torch.fft(image, signal_ndim=2)
         
         if self.noise:
             temp = (temp + self.noise * x['k']) / (1 + self.noise)
         else:
             temp = (1 - x['mask']) * temp + x['k']
 
-        temp = torch.ifft(temp, signal_ndim=2, normalized=True)
+        # temp = torch.ifft(temp, signal_ndim=2, normalized=True)
+        temp = torch.ifft(temp, signal_ndim=2)
         temp = temp.permute(0, 3, 1, 2).float() 
         x['image'] = temp
         return x

@@ -77,23 +77,6 @@ def format_data(data, mask=False):
     data = complex2real(data)
     return data.squeeze(0)
 
-def normalize(data):
-    r = np.abs(data)
-    r_min = r.min()
-    r_max = r.max()
-    for i in range(data.shape[1]):
-        for j in range(data.shape[2]):
-            x = data[0, i, j]
-            y = data[1, i, j]
-            norm = np.abs(x + (1j * y))
-            if norm > 1e-21:
-                x *= (255 / norm)
-                y *= (255 / norm)
-            data[0, i, j] = x
-            data[1, i, j] = y
-    return data
-
-
 def mask_r2c(m):
     return m[0] if m.ndim == 3 else m[:, 0]
 
