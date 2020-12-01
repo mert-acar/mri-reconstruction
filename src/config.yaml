@@ -17,7 +17,7 @@ dataset:
         sample_n: 10
         acq_noise: 0 #acquisation noise
         centred: False
-        norm: null #norm: 'ortho' or null. if 'ortho', performs unitary transform, otherwise normal dft
+        norm: 'ortho'  #norm: 'ortho' or null. if 'ortho', performs unitary transform, otherwise normal dft
 
 # Training parameters
 train:

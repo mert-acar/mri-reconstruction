@@ -103,13 +103,8 @@ class OCMRDataset(torch.utils.data.Dataset):
         return mask
 
 
-    @staticmethod
-    def normalize(data):
-        pass
-
-
     def __getitem__(self, idx):
-        data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn']
+        data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn'] * 1e3
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
         data_und, k_und = self.undersample(data, mask)

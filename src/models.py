@@ -10,12 +10,12 @@ class ResnetBlock(nn.Module):
         super(ResnetBlock, self).__init__()
         self.layers = [
             nn.Conv2d(in_channels, num_filters, kernel_size, stride, padding),
-            nn.ReLU(inplace=True)
+            nn.ReLU()
         ]
         
         for i in range(1,num_layers - 1):
             self.layers.append(nn.Conv2d(num_filters, num_filters, kernel_size, stride, padding))
-            self.layers.append(nn.ReLU(inplace=True))
+            self.layers.append(nn.ReLU())
         
         # Reconstruction layer
         self.layers.append(nn.Conv2d(num_filters, in_channels, kernel_size, stride, padding))
@@ -38,7 +38,6 @@ class DataConsistency(nn.Module):
         image = x['image'].permute(0, 2, 3, 1) # prepare for torch.fft
 
         temp = torch.fft(image, signal_ndim=2, normalized=True)
-        # temp = torch.fft(image, signal_ndim=2)
         
         if self.noise:
             temp = (temp + self.noise * x['k']) / (1 + self.noise)
@@ -46,7 +45,7 @@ class DataConsistency(nn.Module):
             temp = (1 - x['mask']) * temp + x['k']
 
         temp = torch.ifft(temp, signal_ndim=2, normalized=True)
-        # temp = torch.ifft(temp, signal_ndim=2)
+
         temp = temp.permute(0, 3, 1, 2).float() 
         x['image'] = temp
         return x
