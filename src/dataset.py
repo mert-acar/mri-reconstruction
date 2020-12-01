@@ -95,7 +95,6 @@ class OCMRDataset(torch.utils.data.Dataset):
 
         size = mask.itemsize
         mask = as_strided(mask, (N, Nx, Ny), (size * Nx, size, 0))
-
         mask = mask.reshape(shape)
 
         if not self.centred:
@@ -104,15 +103,18 @@ class OCMRDataset(torch.utils.data.Dataset):
         return mask
 
 
+    @staticmethod
+    def normalize(data):
+        pass
+
+
     def __getitem__(self, idx):
         data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn']
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
         data_und, k_und = self.undersample(data, mask)
         data_gnd = format_data(data)
-        data_gnd = normalize(data_gnd)
         data_und = format_data(data_und)
-        data_und = normalize(data_und)
         k_und = format_data(k_und)
         mask = format_data(mask, mask=True)
         return {
@@ -125,8 +127,8 @@ class OCMRDataset(torch.utils.data.Dataset):
 
 if __name__ == '__main__':
     import yaml
-    from cascadeNet import CascadeNetwork
     args = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
     dataset = OCMRDataset(fold='train', **args['dataset'])
     sample = dataset[0]
     print('Sample image shape:', sample['image'].shape)
+    import matplotlib.pyplot as plt

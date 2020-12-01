@@ -4,15 +4,9 @@ __pycache__/
 *$py.class
 .DS_Store
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
 venv/
 data/
+src/__pycache__/
+src/temp.py
+src/xplore.py
+logs/

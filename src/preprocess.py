@@ -7,7 +7,7 @@ import scipy.linalg as la
 from os.path import join as pjn
 from scipy.io import savemat
 from read_ocmr import read_ocmr as read
-from numpy.fft import fftshift, ifftshift, ifftn
+from numpy.fft import fftshift, ifftshift, ifftn, fftn
 
 
 def k2image(kData):
@@ -62,24 +62,25 @@ def pad(array):
     result[tuple(insertHere)] = array
     return result
 
-path = pjn('data', 'fully_sampled')
-for f in tqdm(os.listdir(path)):
-    fname = f.split('.')
-    if fname[-1] != 'h5':
-        continue
-    count = 0
-    kData, param = read(pjn(path, f))
-    kData = filtered(kData)
-    #Inverse 2D Fourier Transform
-    im_coil = k2image(kData)
+if __name__ == '__main__':
+    path = pjn('data', 'fully_sampled')
+    for f in tqdm(os.listdir(path)):
+        fname = f.split('.')
+        if fname[-1] != 'h5':
+            continue
+        count = 0
+        kData, param = read(pjn(path, f))
+        kData = filtered(kData)
+        #Inverse 2D Fourier Transform
+        im_coil = k2image(kData)
 
-    #Remove RO Oversampling
-    R0 = im_coil.shape[0]
-    im_coil = im_coil[math.floor(R0 / 4) : math.floor(3 * R0 / 4)]
-    for z in range(im_coil.shape[2]):
-        im = im_coil[:,:,z,:,:]
-        for t in range(im.shape[-1]):
-            img = im[:,:,:,t]
-            img = pad(img)
-            combined_im = coil_combination(img)
-            savemat(pjn('data','processed', fname[0] + '_' + str(z) + '_' + str(t) + '.mat'), {'xn': combined_im})
+        #Remove RO Oversampling
+        R0 = im_coil.shape[0]
+        im_coil = im_coil[math.floor(R0 / 4) : math.floor(3 * R0 / 4)]
+        for z in range(im_coil.shape[2]):
+            im = im_coil[:,:,z,:,:]
+            for t in range(im.shape[-1]):
+                img = im[:,:,:,t]
+                img = pad(img)
+                combined_im = coil_combination(img)
+                savemat(pjn('data','processed', fname[0] + '_' + str(z) + '_' + str(t) + '.mat'), {'xn': combined_im})

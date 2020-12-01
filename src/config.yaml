@@ -12,8 +12,8 @@ network:
 dataset:
         data_path: '../data/preprocessed/'
         acceleration_factor: 4.0
-        fraction: 0.5 #train set size
-        shuffle: null #Seed for numpy random generator
+        fraction: 0.1 #train set size
+        shuffle: 2 #Seed for numpy random generator
         sample_n: 10
         acq_noise: 0 #acquisation noise
         centred: False

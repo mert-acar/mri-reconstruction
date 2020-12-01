@@ -1,25 +1,19 @@
 import numpy as np
 from numpy.fft import ifftshift, fft2, ifft2, fftshift
 
-
-def pad(array, offsets):
-    """
-    array: Array to be padded
-    reference: Reference array with the desired shape
-    offsets: list of offsets (number of elements must be equal to the dimension of the array)
-    """
+def pad(array):
+    offsets = [(256 - array.shape[dim]) / 2 for dim in range(array.ndim)]
     # Create an array of zeros with the reference shape
-    result = np.zeros([array.shape[0], int(array.shape[1] + (2 * offsets[0])), int(array.shape[2] + (2 * offsets[1]))], dtype=array.dtype)
+    result = np.zeros([int(array.shape[0] + (2 * offsets[0])), int(array.shape[1] + (2 * offsets[1])), array.shape[2]], dtype=array.dtype)
     # Create a list of slices from offset to offset + shape in each dimension
     insertHere = [
-        slice(None), 
-        slice(int(offsets[0]), int(offsets[0] + array.shape[1])),
-        slice(int(offsets[1]), int(offsets[1] + array.shape[2]))
+        slice(int(offsets[0]), int(offsets[0] + array.shape[0])),
+        slice(int(offsets[1]), int(offsets[1] + array.shape[1])),
+        slice(None)
     ]
     # Insert the array in the result at the specified offsets
     result[tuple(insertHere)] = array
     return result
-
 
 def complex_psnr(x, y, peak='normalized'):
     '''
