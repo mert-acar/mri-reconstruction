@@ -7,15 +7,18 @@ from time import time
 from tqdm import tqdm
 from tabulate import tabulate
 from dataset import OCMRDataset
+from models import CascadeNetwork
 from shutil import rmtree, copyfile
-from cascadeNet import CascadeNetwork
 from helpers import back_format, complex_psnr
 
 warnings.filterwarnings('ignore')
 
-def checkpoint(model, path):
-    print('Saving model...')
-    torch.save(model, os.path.join(path, 'checkpoint'))
+def checkpoint(model, optimizer, path):
+    print('SAVING MODEL...')
+    model_dict = {key:value.cpu() for key,value in model.state_dict().items()}
+    optimizer_dict = {key:value.cpu() for key,value in optimizer.state_dict().items()}
+    dict2save = {'model': model_dict, 'optimizer': optimizer_dict}
+    torch.save(dict2save, os.path.join(path, 'checkpoint'))
     
 
 def train_model(model, dataloaders, optimizer, criterion, args):
@@ -50,7 +53,7 @@ def train_model(model, dataloaders, optimizer, criterion, args):
                                                    back_format(output['image'].cpu().detach().numpy())):
                         base_psnr += complex_psnr(im_i, und_i, peak='normalized')
                         test_psnr += complex_psnr(im_i, pred_i, peak='normalized')
-                running_error += loss.item() * bsize
+                running_error += loss.item() * bsize * 1000
             epoch_loss = running_error / len(dataloaders[phase].dataset)
             if phase == 'train':
                 last_train_loss = epoch_loss
@@ -61,7 +64,7 @@ def train_model(model, dataloaders, optimizer, criterion, args):
                 if epoch_loss < best_loss:
                     best_loss = epoch_loss
                     best_epoch = epoch
-                    checkpoint(model, args['output_path'])
+                    checkpoint(model, optimizer, args['output_path'])
         print('Training Loss:\t\t{:.9f}'.format(last_train_loss))
         print('Testing Loss:\t\t{:.9f}'.format(epoch_loss))
         print('Base PSNR:\t\t{:.9f}'.format(base_psnr))
@@ -74,8 +77,6 @@ def train_model(model, dataloaders, optimizer, criterion, args):
         f.write(t)
     elapsed = time() - before
     print("Training complete in {:.0f}m {:.0f}s".format(elapsed // 60, elapsed % 60))
-    model = torch.load(os.path.join(args['output_path'], 'checkpoint'))
-    return model
 
 
 def train():
@@ -120,9 +121,8 @@ def train():
     criterion = torch.nn.MSELoss()
     print('Training starting with', len(dataloaders['train'].dataset),
           'training and', len(dataloaders['test'].dataset), 'testing data...')
-    model = train_model(model, dataloaders, optimizer, criterion, train_args)
-    return model
+    train_model(model, dataloaders, optimizer, criterion, train_args)
     
 
 if __name__ == '__main__':
-    model = train()
+    train()
