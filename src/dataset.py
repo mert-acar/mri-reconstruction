@@ -8,7 +8,8 @@ from numpy.lib.stride_tricks import as_strided
 
 
 class OCMRDataset(torch.utils.data.Dataset):
-    def __init__(self, data_path, fold='train', fraction=0.85, shuffle=None, acceleration_factor=4.0, sample_n=10, acq_noise=0, centred=False, norm='ortho'):
+    def __init__(self, data_path, fold='train', fraction=0.85, shuffle=None, acceleration_factor=4.0, sample_n=10, acq_noise=0, centred=False, norm='ortho', evalset=False):
+        self.evalset = evalset
         self.data_path = data_path
         self.acc = acceleration_factor
         self.sample_n = sample_n
@@ -104,6 +105,8 @@ class OCMRDataset(torch.utils.data.Dataset):
 
 
     def __getitem__(self, idx):
+        if self.evalset and idx == 0:
+            np.random.seed(9001)
         data = loadmat(os.path.join(self.data_path, self.files[idx]))['xn'] * 1e3
         data = np.expand_dims(data, 0)
         mask = self.cartesian_mask(data.shape)
@@ -126,4 +129,20 @@ if __name__ == '__main__':
     dataset = OCMRDataset(fold='train', **args['dataset'])
     sample = dataset[0]
     print('Sample image shape:', sample['image'].shape)
+    print('Sample full shape:', sample['full'].shape)
+    """
+    from models import CascadeNetwork
     import matplotlib.pyplot as plt
+    net = CascadeNetwork(**args['network'])
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1)
+    dataloader = iter(dataloader)
+    sample = next(dataloader)
+    sample['image'] = sample['image'].float()
+    out = net(sample)
+    img = out['image'].detach().numpy().squeeze()
+    img = img[0] + (1j * img[1])
+    img = np.abs(img)
+    plt.imshow(img, cmap='gray')
+    plt.axis(False)
+    plt.show()
+    """

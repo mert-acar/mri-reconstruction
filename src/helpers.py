@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.fft import ifftshift, fft2, ifft2, fftshift
+from skimage.metrics import structural_similarity
 
 def pad(array):
     offsets = [(256 - array.shape[dim]) / 2 for dim in range(array.ndim)]
@@ -31,6 +32,16 @@ def complex_psnr(x, y, peak='normalized'):
         return 10*np.log10(1./mse)
 
 
+def ssim(x, y):
+    score = 0
+    for i in range(x.shape[0]):
+        tempx = np.abs(x[i])
+        tempy = np.abs(y[i])
+        score += structural_similarity(tempx, tempy)
+    score /= x.shape[0]
+    return score
+    
+
 def complex2real(x):
     '''
     Parameter
@@ -55,15 +66,9 @@ def real2complex(x):
     '''
     Converts from array of the form ([n, ]2, nx, ny[, nt]) to ([n, ]nx, ny[, nt])
     '''
-    x = np.asarray(x)
-    if x.shape[0] == 2 and x.shape[1] != 2:  # Hacky check
-        return x[0] + x[1] * 1j
-    elif x.shape[1] == 2:
-        y = x[:, 0] + x[:, 1] * 1j
-        return y
-    else:
-        raise ValueError('Invalid dimension')
-
+    x = x[:,0] + (1j * x[:,1])  
+    assert x.dtype == np.complex64
+    return x
 
 def format_data(data, mask=False):
     if mask: 
@@ -75,7 +80,7 @@ def mask_r2c(m):
     return m[0] if m.ndim == 3 else m[:, 0]
 
 
-def back_format(data, mask=True):
+def back_format(data, mask=False):
     if mask:
         data = mask_r2c(data)
     else:

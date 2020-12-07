@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.py.sw[poc]
 *$py.class
 .DS_Store
 
@@ -9,4 +10,5 @@ data/
 src/__pycache__/
 src/temp.py
 src/xplore.py
+src/mert.py
 logs/

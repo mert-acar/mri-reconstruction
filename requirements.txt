@@ -24,3 +24,4 @@ tabulate
 torch
 tqdm
 urllib3
+scikit-image

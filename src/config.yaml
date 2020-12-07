@@ -12,8 +12,8 @@ network:
 dataset:
         data_path: '../data/preprocessed/'
         acceleration_factor: 4.0
-        fraction: 0.8 #train set size
-        shuffle: 2 #Seed for numpy random generator
+        fraction: 0.1 #train set size
+        shuffle: 3 #Seed for numpy random generator
         sample_n: 10
         acq_noise: 0 #acquisation noise
         centred: False
@@ -21,16 +21,16 @@ dataset:
 
 # Training parameters
 train:
-        batch_size: 10
-        num_epochs: 10000
+        batch_size: 1
+        num_epochs: 5
         early_stop: 100
 
         # Adam Optimizer Parameters
-        learning_rate: 0.0001
+        learning_rate: 0.001
         b_1: 0.9
         b_2: 0.999
         l2: 0.0000001
 
         # Miscellaneous
-        output_path: '../logs/sanity_check2'
-        cuda: True
+        output_path: '../logs/sanity_check3'
+        cuda: False
