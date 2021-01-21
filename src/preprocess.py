@@ -9,6 +9,7 @@ from scipy.io import savemat
 from read_ocmr import read_ocmr as read
 from numpy.fft import fftshift, ifftshift, ifftn, fftn
 
+# Data shape: [kx ky kz coil phase set slice rep avg]
 
 def k2image(kData):
     img = fftshift(ifftn(ifftshift(kData, axes=[0,1]), s=None, axes=[0,1]), axes=[0,1])
@@ -43,9 +44,8 @@ def coil_combination(im_coil, w=5):
 
 def filtered(kData):
     kData = np.mean(kData, axis=len(kData.shape) - 1)
-    kData = kData[tuple([slice(None) if (i != len(kData.shape) - 1) else math.floor(kData.shape[i] / 2) for i in range(len(kData.shape)) ])] #Remove rep
-    kData = kData[tuple([slice(None) if (i != len(kData.shape) - 1) else math.floor(kData.shape[i] / 2) for i in range(len(kData.shape)) ])] #Remove rep
-    kData = kData[tuple([slice(None) if (i != len(kData.shape) - 1) else math.floor(kData.shape[i] / 2) for i in range(len(kData.shape)) ])] #Remove rep
+    for i in range(3):
+        kData = kData[tuple([slice(None) if (i != len(kData.shape) - 1) else math.floor(kData.shape[i] / 2) for i in range(len(kData.shape)) ])]
     return kData
 
 def pad(array):
@@ -63,7 +63,7 @@ def pad(array):
     return result
 
 if __name__ == '__main__':
-    path = pjn('data', 'fully_sampled')
+    path = pjn('../../ocmr/data', 'fully_sampled')
     for f in tqdm(os.listdir(path)):
         fname = f.split('.')
         if fname[-1] != 'h5':
@@ -71,6 +71,7 @@ if __name__ == '__main__':
         count = 0
         kData, param = read(pjn(path, f))
         kData = filtered(kData)
+
         #Inverse 2D Fourier Transform
         im_coil = k2image(kData)
 
@@ -83,4 +84,4 @@ if __name__ == '__main__':
                 img = im[:,:,:,t]
                 img = pad(img)
                 combined_im = coil_combination(img)
-                savemat(pjn('data','processed', fname[0] + '_' + str(z) + '_' + str(t) + '.mat'), {'xn': combined_im})
+                savemat(pjn('../data','preprocessed', fname[0] + '_' + str(z) + '_' + str(t) + '.mat'), {'xn': combined_im})

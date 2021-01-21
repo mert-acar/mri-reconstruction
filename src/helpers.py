@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.fft import ifftshift, fft2, ifft2, fftshift
-from skimage.metrics import structural_similarity
+from skimage.measure import compare_ssim
 
 def pad(array):
     offsets = [(256 - array.shape[dim]) / 2 for dim in range(array.ndim)]
@@ -37,7 +37,7 @@ def ssim(x, y):
     for i in range(x.shape[0]):
         tempx = np.abs(x[i])
         tempy = np.abs(y[i])
-        score += structural_similarity(tempx, tempy)
+        score += compare_ssim(tempx, tempy)
     score /= x.shape[0]
     return score
     
