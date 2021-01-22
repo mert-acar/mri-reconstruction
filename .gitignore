@@ -8,7 +8,4 @@ __pycache__/
 venv/
 data/
 src/__pycache__/
-src/temp.py
-src/xplore.py
-src/mert.py
 logs/

@@ -114,6 +114,3 @@ def ifft2c(x, norm='ortho'):
     axes = (-2, -1)  # get last 2 axes
     res = fftshift(ifft2(ifftshift(x, axes=axes), norm=norm), axes=axes)
     return res
-
-
-

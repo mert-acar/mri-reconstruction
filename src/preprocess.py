@@ -1,5 +1,4 @@
 import os
-import sys
 import math
 import numpy as np
 from tqdm import tqdm
@@ -10,6 +9,14 @@ from read_ocmr import read_ocmr as read
 from numpy.fft import fftshift, ifftshift, ifftn, fftn
 
 # Data shape: [kx ky kz coil phase set slice rep avg]
+
+def normalize(img):
+    mag = np.abs(img)
+    mag /= mag.max()
+    pha = np.angle(img)
+    r = mag * np.cos(pha)
+    i = mag * np.sin(pha)
+    return r + (1j * i)
 
 def k2image(kData):
     img = fftshift(ifftn(ifftshift(kData, axes=[0,1]), s=None, axes=[0,1]), axes=[0,1])
@@ -84,4 +91,5 @@ if __name__ == '__main__':
                 img = im[:,:,:,t]
                 img = pad(img)
                 combined_im = coil_combination(img)
+                combined_im = normalize(combined_im)
                 savemat(pjn('../data','preprocessed', fname[0] + '_' + str(z) + '_' + str(t) + '.mat'), {'xn': combined_im})
